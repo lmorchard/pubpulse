@@ -50,3 +50,21 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  notebook:
+    image: jupyter/scipy-notebook
+    restart: always
+    ports:
+      - 8888:8888
+    environment:
+      DATABASE_URL: "postgresql://postgres:8675309jenny@db:5432/example"
+      DATABASE_HOST: "db"
+      DATABASE_PORT: 5432
+      DATABASE_USER: "postgres"
+      DATABASE_PASSWORD: "8675309jenny"
+      DATABASE_NAME: "example"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./notebook:/home/jovyan
