@@ -13,12 +13,14 @@ class Config:
 
     debug: bool = False
 
+    database_url: str = ""
+
     api_base_url: str = ""
     client_key: str = ""
     client_secret: str = ""
     access_token: str = ""
 
-    user_agent: str = "LogoTron 1.0"
+    user_agent: str = "Agent Jumbo 0.1"
     debug_requests: bool = False
 
     def __init__(self, raw_config={}):

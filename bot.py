@@ -1,13 +1,34 @@
 import logging
+import json
 import mastodon.streaming
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
 
 from agent_jumbo.mastodon_client import MastodonClient
 from agent_jumbo.config import config
 from agent_jumbo.logging import logger
+from agent_jumbo.models import db, Status
+
+
+from datetime import date, datetime
+
+def json_serial(obj):
+    """JSON serializer for objects not serializable by default json code"""
+
+    if isinstance(obj, (datetime, date)):
+        return obj.isoformat()
+    raise TypeError ("Type %s not serializable" % type(obj))
 
 
 def main():
     log = logging.getLogger("bot")
+
+    engine = create_engine(
+        config.database_url,
+        json_serializer=lambda obj: json.dumps(obj, default=json_serial, ensure_ascii=False),
+        json_deserializer=lambda obj: json.loads(obj, ensure_ascii=False)
+    )
 
     print("Hello World!")
     print(f"{config.api_base_url}")
@@ -22,25 +43,30 @@ def main():
     )
 
     client.stream_public(
-        listener=BotStreamListener(client=client),
+        listener=BotStreamListener(client=client, engine=engine),
         reconnect_async=True
     )
 
 
 class BotStreamListener(mastodon.streaming.StreamListener):
-    def __init__(self, client):
+    def __init__(self, client, engine):
         # self.bot = bot
         self.client = client
         self.logger = logging.getLogger("bot")
+        self.engine = engine
 
-    def on_notification(self, notification):
-        self.logger.debug(notification)
-
-    def on_update(self, update):
-        self.logger.debug(update)
+    def on_update(self, status):
+        self.logger.debug(status.url)
+        with Session(self.engine) as session:
+            status = Status(
+                url = status.url,
+                status = status
+            )
+            session.add_all([status])
+            session.commit()
 
     def on_status_update(self, update):
-        self.logger.debug(update)
+        self.logger.debug(update.url)
 
 
 if __name__ == "__main__":
