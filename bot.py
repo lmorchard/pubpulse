@@ -1,6 +1,8 @@
 import logging
 import json
+import time
 import mastodon.streaming
+import mastodon.errors
 
 from sqlalchemy import create_engine
 from sqlalchemy.dialects.postgresql import insert
@@ -31,9 +33,6 @@ def main():
         json_deserializer=lambda obj: json.loads(obj, ensure_ascii=False)
     )
 
-    print("Hello World!")
-    print(f"{config.api_base_url}")
-
     client = MastodonClient(
         user_agent=config.user_agent,
         api_base_url=config.api_base_url,
@@ -43,10 +42,16 @@ def main():
         debug_requests=config.debug_requests,
     )
 
-    client.stream_public(
-        listener=BotStreamListener(client=client, engine=engine),
-        reconnect_async=True
-    )
+    while True:
+        try:
+            client.stream_public(
+                listener=BotStreamListener(client=client, engine=engine),
+                reconnect_async=True
+            )
+        except mastodon.errors.MastodonNetworkError as e:
+            pass
+
+        time.sleep(10)
 
 
 class BotStreamListener(mastodon.streaming.StreamListener):

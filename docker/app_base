@@ -54,4 +54,17 @@ CMD python3 -m flask run --host=0.0.0.0 --port=${PORT}
 # --------------------------------------------------------------
 
 FROM base as bot_dev
+# CMD python3 bot.py
+CMD watchmedo auto-restart \
+    --directory='.' \
+    --recursive \
+    --patterns='*.py' \
+    --ignore-directories \
+    --ignore-patterns='db/*;log/*' \
+    python3 bot.py
+
+# --------------------------------------------------------------
+
+FROM base as bot_prod
+COPY . .
 CMD python3 bot.py

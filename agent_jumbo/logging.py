@@ -15,10 +15,21 @@ named_log_levels = dict(
 )
 
 
+class NoiseFilter(logging.Filter):
+    def filter(self, record):
+        if record.name.startswith("watchdog"):
+            return False
+        return True
+
+
 def build_logger(config, name=__name__):
+    stream_handler = logging.StreamHandler()
+    stream_handler.addFilter(NoiseFilter())
+
     logging_handlers = [
-        logging.StreamHandler()
+        stream_handler
     ]
+
     if config.log_filename:
         logging_handlers.append(
             logging.handlers.RotatingFileHandler(
@@ -27,12 +38,14 @@ def build_logger(config, name=__name__):
                 backupCount=config.log_backup_count
             )
         )
+
     logging.basicConfig(
         handlers=logging_handlers,
         level=named_log_levels.get(config.log_level, "INFO"),
         format="[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s",
         datefmt='%Y-%m-%dT%H:%M:%S'
     )
+
     return logging.getLogger(name)
 
 
