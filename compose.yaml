@@ -17,6 +17,22 @@ services:
       db:
         condition: service_healthy
 
+  bot:
+    build:
+      context: .
+      dockerfile: docker/app_base
+      target: bot_dev
+    volumes:
+      - ./:/app
+      - ./log:/log
+    environment:
+      AGENT_JUMBO_LOG_LEVEL: DEBUG
+      AGENT_JUMBO_DEBUG: True
+      AGENT_JUMBO_DATABASE_URL: "postgresql://postgres:8675309jenny@db:5432/example"
+    depends_on:
+      db:
+        condition: service_healthy
+
   db:
     image: postgres
     restart: always

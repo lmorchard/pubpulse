@@ -11,7 +11,6 @@ class Base(DeclarativeBase):
 
 db = SQLAlchemy(model_class=Base)
 
-
 class MyJsonType(TypeDecorator):
     impl = JSON
 
@@ -24,4 +23,4 @@ class MyJsonType(TypeDecorator):
 class Status(db.Model):
     __tablename__ = "statuses"
     url: Mapped[str] = mapped_column(primary_key=True)
-    status: Mapped[Optional[dict|list]] = mapped_column(type_=MyJsonType)
+    status: Mapped[Optional[dict|list]] = mapped_column(type_=JSON)
