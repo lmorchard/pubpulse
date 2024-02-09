@@ -3,6 +3,7 @@ import json
 import mastodon.streaming
 
 from sqlalchemy import create_engine
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from agent_jumbo.mastodon_client import MastodonClient
@@ -56,17 +57,21 @@ class BotStreamListener(mastodon.streaming.StreamListener):
         self.engine = engine
 
     def on_update(self, status):
+        self.upsert_status(status)
+
+    def on_status_update(self, status):
+        self.upsert_status(status)
+
+    def upsert_status(self, status):
         self.logger.debug(status.url)
         with Session(self.engine) as session:
-            status = Status(
-                url = status.url,
-                status = status
-            )
-            session.add_all([status])
-            session.commit()
-
-    def on_status_update(self, update):
-        self.logger.debug(update.url)
+          insert_stmt = insert(Status).values(url = status.url, status = status)
+          upsert_stmt = insert_stmt.on_conflict_do_update(
+              index_elements=['url'],
+              set_={'status': insert_stmt.excluded.status}
+          )
+          session.execute(upsert_stmt)
+          session.commit()
 
 
 if __name__ == "__main__":
