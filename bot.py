@@ -1,6 +1,7 @@
 import logging
 import json
 import time
+import requests.exceptions
 import mastodon.streaming
 import mastodon.errors
 
@@ -49,6 +50,8 @@ def main():
                 reconnect_async=True
             )
         except mastodon.errors.MastodonNetworkError as e:
+            pass
+        except requests.exceptions.SSLError as e:
             pass
 
         time.sleep(10)
