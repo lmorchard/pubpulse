@@ -42,28 +42,22 @@ EXPOSE ${PORT}
 
 FROM base as appserver_dev
 ENV FLASK_ENV=development
-CMD python3 -m flask run --debug --host=0.0.0.0 --port=${PORT}
+ENTRYPOINT python3 -m flask run --debug --host=0.0.0.0 --port=${PORT}
 
 # --------------------------------------------------------------
 
 FROM base as appserver_prod
 ENV FLASK_ENV=production
 COPY . .
-CMD python3 -m flask run --host=0.0.0.0 --port=${PORT}
+ENTRYPOINT python3 -m flask run --host=0.0.0.0 --port=${PORT}
 
 # --------------------------------------------------------------
 
 FROM base as bot_dev
-CMD watchmedo auto-restart \
-    --directory='.' \
-    --recursive \
-    --patterns='*.py' \
-    --ignore-directories \
-    --ignore-patterns='db/*;log/*' \
-    python3 bot.py
+ENTRYPOINT /app/scripts/start-bot-dev.sh
 
 # --------------------------------------------------------------
 
 FROM base as bot_prod
 COPY . .
-CMD python3 bot.py
+ENTRYPOINT /app/scripts/start-bot.sh
