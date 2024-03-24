@@ -34,7 +34,7 @@ services:
         condition: service_healthy
 
   db:
-    image: postgres
+    image: pgvector/pgvector:pg16
     restart: always
     volumes:
       - ./db:/var/lib/postgresql/data
@@ -63,6 +63,7 @@ services:
       DATABASE_USER: "postgres"
       DATABASE_PASSWORD: "8675309jenny"
       DATABASE_NAME: "example"
+      HF_TOKEN: ${AGENT_JUMBO_HF_TOKEN}
     depends_on:
       db:
         condition: service_healthy

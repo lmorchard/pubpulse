@@ -13,6 +13,12 @@ Someday, maybe an agent for finding good stuff in the firehose
 1. `docker compose up`
 1. Visit the notebook at `http://127.0.0.1:8888/lab`
 
+## dev notes
+
+- [flask migrate docs](https://flask-migrate.readthedocs.io/en/latest/index.html)
+  - `flask db migrate -m'add ingested_at datestamp'`
+  - `flask db upgrade`
+
 ## TODO
 
 - implement a command to auto-create a new app on a mastodon instance and initiate oauth dance?

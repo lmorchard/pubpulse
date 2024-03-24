@@ -20,6 +20,8 @@ class Config:
     client_secret: str = ""
     access_token: str = ""
 
+    hf_token: str = ""
+
     user_agent: str = "Agent Jumbo 0.1"
     debug_requests: bool = False
 

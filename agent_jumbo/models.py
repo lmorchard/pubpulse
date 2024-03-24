@@ -1,7 +1,9 @@
+import datetime
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import Integer, String, JSON
+from sqlalchemy import Integer, String, JSON, DateTime
 from sqlalchemy import TypeDecorator
 
 from typing import Optional
@@ -24,3 +26,6 @@ class Status(db.Model):
     __tablename__ = "statuses"
     url: Mapped[str] = mapped_column(primary_key=True)
     status: Mapped[Optional[dict|list]] = mapped_column(type_=JSON)
+    ingested_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
