@@ -2,7 +2,7 @@ import os
 from dataclasses import dataclass, fields
 from dotenv import dotenv_values
 
-ENV_PREFIX = "AGENT_JUMBO"
+ENV_PREFIX = "MASTODON_AGENT"
 
 @dataclass
 class Config:
@@ -33,6 +33,7 @@ class Config:
 
 
 config = Config({
+    **dotenv_values("/app/.env"),
     **dotenv_values(".env"),
     **os.environ
 })

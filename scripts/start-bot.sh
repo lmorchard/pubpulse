@@ -1,3 +1,3 @@
 #!/bin/sh
-flask db upgrade
-python3 bot.py
+python3 -m flask --app mastodon_agent/webapp db upgrade
+python3 -m mastodon_agent.bot

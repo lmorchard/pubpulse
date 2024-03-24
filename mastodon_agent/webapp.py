@@ -2,9 +2,9 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-from agent_jumbo.config import config
-from agent_jumbo.logging import logger
-from agent_jumbo.models import db
+from .config import config
+from .log import logger
+from .models import db
 
 
 app = Flask(__name__)

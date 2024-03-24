@@ -9,10 +9,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
-from agent_jumbo.mastodon_client import MastodonClient
-from agent_jumbo.config import config
-from agent_jumbo.logging import logger
-from agent_jumbo.models import db, Status
+from .client import MastodonClient
+from .config import config
+from .log import logger
+from .models import db, Status
 
 
 from datetime import date, datetime

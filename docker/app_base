@@ -6,6 +6,7 @@ FROM python:${PYTHON_VERSION}-slim as base
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV FLASK_ENV=development
+ENV FLASK_APP=mastodon_agent.webapp
 
 ARG PORT
 ENV PORT=${PORT:-8675}
@@ -42,14 +43,14 @@ EXPOSE ${PORT}
 
 FROM base as appserver_dev
 ENV FLASK_ENV=development
-ENTRYPOINT python3 -m flask run --debug --host=0.0.0.0 --port=${PORT}
+ENTRYPOINT /app/scripts/start-app-dev.sh
 
 # --------------------------------------------------------------
 
 FROM base as appserver_prod
 ENV FLASK_ENV=production
 COPY . .
-ENTRYPOINT python3 -m flask run --host=0.0.0.0 --port=${PORT}
+ENTRYPOINT /app/scripts/start-app.sh
 
 # --------------------------------------------------------------
 
