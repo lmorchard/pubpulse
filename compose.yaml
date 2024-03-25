@@ -59,6 +59,7 @@ services:
     ports:
       - 8888:8888
     environment:
+      GRANT_SUDO: yes
       DATABASE_URL: "postgresql://postgres:8675309jenny@db:5432/example"
       DATABASE_HOST: "db"
       DATABASE_PORT: 5432
