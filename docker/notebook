@@ -1,4 +1,21 @@
-FROM quay.io/jupyter/pytorch-notebook:cuda12-python-3.11.8
+# FROM quay.io/jupyter/pytorch-notebook
+FROM quay.io/jupyter/scipy-notebook
+
+# see: https://github.com/jupyter/docker-stacks/blob/main/images/pytorch-notebook/cuda12/Dockerfile
+# trying a different pytorch-notebook build to support pytorch using GPU a newer macbook?
+
+# Install PyTorch with pip (https://pytorch.org/get-started/locally/)
+# hadolint ignore=DL3013
+RUN pip install --no-cache-dir \
+    --extra-index-url=https://pypi.nvidia.com \
+    --extra-index-url https://download.pytorch.org/whl/nightly/cpu \
+    'torch' \
+    'torchvision' \
+    'torchaudio'
+
+# https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/docker-specialized.html#dockerfiles
+ENV NVIDIA_VISIBLE_DEVICES all
+ENV NVIDIA_DRIVER_CAPABILITIES compute,utility
 
 RUN --mount=type=bind,source=requirements.txt,target=requirements.txt \
     python -m pip install -r requirements.txt

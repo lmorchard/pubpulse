@@ -1,38 +1,8 @@
+version: '3'
+
+
+
 services:
-  server:
-    build:
-      context: .
-      dockerfile: docker/app_base
-      target: appserver_dev
-    ports:
-      - 8675:8675
-    volumes:
-      - ./:/app
-      - ./log:/log
-    environment:
-      MASTODON_AGENT_LOG_LEVEL: DEBUG
-      MASTODON_AGENT_DEBUG: True
-      MASTODON_AGENT_DATABASE_URL: "postgresql://postgres:8675309jenny@db:5432/example"
-    depends_on:
-      db:
-        condition: service_healthy
-
-  bot:
-    build:
-      context: .
-      dockerfile: docker/app_base
-      target: bot_dev
-    volumes:
-      - ./:/app
-      - ./log:/log
-    environment:
-      MASTODON_AGENT_LOG_LEVEL: DEBUG
-      MASTODON_AGENT_DEBUG: True
-      MASTODON_AGENT_DATABASE_URL: "postgresql://postgres:8675309jenny@db:5432/example"
-    depends_on:
-      db:
-        condition: service_healthy
-
   db:
     image: pgvector/pgvector:pg16
     restart: always
@@ -45,32 +15,75 @@ services:
       - PGDATA=/var/lib/postgresql/data/pgdata
     expose:
       - 5432
+    ports:
+      - 55432:5432
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  notebook:
+  embeddings:
+    image: ghcr.io/clems4ever/torchserve-all-minilm-l6-v2:latest
+    ports:
+      - 8674:8080
+
+  bot:
     build:
       context: .
-      dockerfile: docker/notebook
-    restart: always
-    ports:
-      - 8888:8888
-    environment:
-      GRANT_SUDO: yes
-      DATABASE_URL: "postgresql://postgres:8675309jenny@db:5432/example"
-      DATABASE_HOST: "db"
-      DATABASE_PORT: 5432
-      DATABASE_USER: "postgres"
-      DATABASE_PASSWORD: "8675309jenny"
-      DATABASE_NAME: "example"
-      HF_TOKEN: ${MASTODON_AGENT_HF_TOKEN}
-    depends_on:
-      db:
-        condition: service_healthy
+      dockerfile: docker/app_base
+      target: bot_dev
     volumes:
       - ./:/app
       - ./log:/log
-      - ./notebook:/home/jovyan
+    environment:
+      MASTODON_AGENT_LOG_LEVEL: DEBUG
+      MASTODON_AGENT_DEBUG: True
+      MASTODON_AGENT_DATABASE_URL: &database-url "postgresql://postgres:8675309jenny@db:5432/example"
+      MASTODON_AGENT_EMBEDDINGS_URL: &embeddings-url "http://embeddings:8080/predictions/my_model"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  webapp:
+    build:
+      context: .
+      dockerfile: docker/app_base
+      target: appserver_dev
+    ports:
+      - 8675:8675
+    volumes:
+      - ./:/app
+      - ./log:/log
+    environment:
+      MASTODON_AGENT_LOG_LEVEL: DEBUG
+      MASTODON_AGENT_DEBUG: True
+      MASTODON_AGENT_DATABASE_URL: *database-url
+      MASTODON_AGENT_EMBEDDINGS_URL: *embeddings-url
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # notebook:
+  #   build:
+  #     context: .
+  #     dockerfile: docker/notebook
+  #   restart: always
+  #   ports:
+  #     - 8888:8888
+  #   environment:
+  #     GRANT_SUDO: yes
+  #     DATABASE_URL: "postgresql://postgres:8675309jenny@db:5432/example"
+  #     DATABASE_HOST: "db"
+  #     DATABASE_PORT: 5432
+  #     DATABASE_USER: "postgres"
+  #     DATABASE_PASSWORD: "8675309jenny"
+  #     DATABASE_NAME: "example"
+  #     HF_TOKEN: ${MASTODON_AGENT_HF_TOKEN}
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   volumes:
+  #     - ./:/app
+  #     - ./log:/log
+  #     - ./notebook:/home/jovyan

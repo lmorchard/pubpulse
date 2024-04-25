@@ -8,4 +8,11 @@ tmp
 db
 log
 venv
-notebook/.*
+play
+notebook/\.*
+notebook/runtime
+notebook/data
+notebook/config/migrated
+notebook/config/lab
+notebook/work
+notebook/config/serverconfig

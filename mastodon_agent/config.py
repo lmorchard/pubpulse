@@ -22,7 +22,9 @@ class Config:
 
     hf_token: str = ""
 
-    user_agent: str = "Agent Jumbo 0.1"
+    embeddings_api_url: str = ""
+
+    user_agent: str = "PubPulse 0.1"
     debug_requests: bool = False
 
     def __init__(self, raw_config={}):
