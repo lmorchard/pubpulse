@@ -57,6 +57,8 @@ Someday, hopefully all the above can be deployed to cloud servers all in Docker 
 
 ## TODO
 
+- is status url correct to use as unique ID?
+
 - move notebook back into docker as a forcing-function to rely on local ML API for GPU-bound stuff?
 
 - rabbitmq okay for production? move to redis or postgres for celery?
