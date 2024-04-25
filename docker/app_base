@@ -55,11 +55,22 @@ ENTRYPOINT /app/scripts/start-webapp.sh
 
 # --------------------------------------------------------------
 
-FROM base as bot_dev
-ENTRYPOINT /app/scripts/start-bot-dev.sh
+FROM base as ingest_bot_dev
+ENTRYPOINT /app/scripts/start-ingest-bot-dev.sh
 
 # --------------------------------------------------------------
 
-FROM base as bot_prod
+FROM base as ingest_bot_prod
 COPY . .
-ENTRYPOINT /app/scripts/start-bot.sh
+ENTRYPOINT /app/scripts/start-ingest-bot.sh
+
+# --------------------------------------------------------------
+
+FROM base as worker_general_cpu_dev
+ENTRYPOINT /app/scripts/start-worker-general-cpu-dev.sh
+
+# --------------------------------------------------------------
+
+FROM base as worker_general_cpu_prod
+COPY . .
+ENTRYPOINT /app/scripts/start-worker-general-cpu.sh

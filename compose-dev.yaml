@@ -21,20 +21,20 @@ services:
       timeout: 5s
       retries: 5
 
-  #embeddings:
-  #  image: ghcr.io/clems4ever/torchserve-all-minilm-l6-v2:latest
-  #  ports:
-  #    - 8674:8080
+  rabbitmq:
+    image: rabbitmq
+    ports:
+      - 5672:5672
 
-  bot:
+  ingest-bot:
     build:
       context: .
       dockerfile: docker/app_base
-      target: bot_dev
+      target: ingest_bot_dev
     volumes:
       - ./:/app
       - ./log:/log
-    # mlapi will run on host for GPU access, so we need this gateway
+    # local ML API will run on host for GPU access, so we need this gateway to host
     extra_hosts:
         - "host.docker.internal:host-gateway"
     environment:
@@ -42,6 +42,8 @@ services:
       MASTODON_AGENT_DEBUG: True
       MASTODON_AGENT_DATABASE_URL: &database-url "postgresql://postgres:8675309jenny@db:5432/example"
       MASTODON_AGENT_ML_API_URL: &mlapi-url "http://host.docker.internal:8673"
+      MASTODON_AGENT_CELERY_BROKER_URL: &celery-broker-url "amqp://rabbitmq"
+      MASTODON_AGENT_CELERY_RESULTS_BACKEND: &celery-results-backend "rpc://rabbitmq"
     depends_on:
       db:
         condition: service_healthy
@@ -56,7 +58,7 @@ services:
     volumes:
       - ./:/app
       - ./log:/log
-    # mlapi will run on host for GPU access, so we need this gateway
+    # local ML API will run on host for GPU access, so we need this gateway to host
     extra_hosts:
         - "host.docker.internal:host-gateway"
     environment:
@@ -64,6 +66,27 @@ services:
       MASTODON_AGENT_DEBUG: True
       MASTODON_AGENT_DATABASE_URL: *database-url
       MASTODON_AGENT_ML_API_URL: *mlapi-url
+      MASTODON_AGENT_CELERY_BROKER_URL: *celery-broker-url
+      MASTODON_AGENT_CELERY_RESULTS_BACKEND: *celery-results-backend
+    depends_on:
+      db:
+        condition: service_healthy
+
+  worker-general-cpu:
+    build:
+      context: .
+      dockerfile: docker/app_base
+      target: worker_general_cpu_dev
+    volumes:
+      - ./:/app
+      - ./log:/log
+    environment:
+      MASTODON_AGENT_LOG_LEVEL: DEBUG
+      MASTODON_AGENT_DEBUG: True
+      MASTODON_AGENT_DATABASE_URL: *database-url
+      MASTODON_AGENT_ML_API_URL: *mlapi-url
+      MASTODON_AGENT_CELERY_BROKER_URL: *celery-broker-url
+      MASTODON_AGENT_CELERY_RESULTS_BACKEND: *celery-results-backend
     depends_on:
       db:
         condition: service_healthy

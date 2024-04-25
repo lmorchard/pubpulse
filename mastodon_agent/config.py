@@ -15,6 +15,9 @@ class Config:
 
     database_url: str = ""
 
+    celery_broker_url: str = ""
+    celery_results_backend: str = ""
+
     api_base_url: str = ""
     client_key: str = ""
     client_secret: str = ""

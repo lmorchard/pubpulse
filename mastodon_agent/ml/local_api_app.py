@@ -6,9 +6,9 @@ from flask_migrate import Migrate
 
 from sentence_transformers import SentenceTransformer
 
-from .config import config
-from .log import logger
-from .models import db
+from ..config import config
+from ..log import logger
+from ..models import db
 
 
 app = Flask(__name__)

@@ -1,9 +1,8 @@
-#!/bin/sh
-python3 -m flask --app mastodon_agent/webapp db upgrade
+#!/bin/bash
 watchmedo auto-restart \
     --directory='.' \
     --recursive \
     --patterns='*.py' \
     --ignore-directories \
     --ignore-patterns='db/*;log/*' \
-    ./scripts/start-bot.sh
+    ./scripts/start-worker-general-cpu.sh
