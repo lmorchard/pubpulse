@@ -1,7 +1,5 @@
 version: '3'
 
-
-
 services:
   db:
     image: pgvector/pgvector:pg16
@@ -23,10 +21,10 @@ services:
       timeout: 5s
       retries: 5
 
-  embeddings:
-    image: ghcr.io/clems4ever/torchserve-all-minilm-l6-v2:latest
-    ports:
-      - 8674:8080
+  #embeddings:
+  #  image: ghcr.io/clems4ever/torchserve-all-minilm-l6-v2:latest
+  #  ports:
+  #    - 8674:8080
 
   bot:
     build:
@@ -36,11 +34,14 @@ services:
     volumes:
       - ./:/app
       - ./log:/log
+    # mlapi will run on host for GPU access, so we need this gateway
+    extra_hosts:
+        - "host.docker.internal:host-gateway"
     environment:
       MASTODON_AGENT_LOG_LEVEL: DEBUG
       MASTODON_AGENT_DEBUG: True
       MASTODON_AGENT_DATABASE_URL: &database-url "postgresql://postgres:8675309jenny@db:5432/example"
-      MASTODON_AGENT_EMBEDDINGS_URL: &embeddings-url "http://embeddings:8080/predictions/my_model"
+      MASTODON_AGENT_ML_API_URL: &mlapi-url "http://host.docker.internal:8673"
     depends_on:
       db:
         condition: service_healthy
@@ -55,11 +56,14 @@ services:
     volumes:
       - ./:/app
       - ./log:/log
+    # mlapi will run on host for GPU access, so we need this gateway
+    extra_hosts:
+        - "host.docker.internal:host-gateway"
     environment:
       MASTODON_AGENT_LOG_LEVEL: DEBUG
       MASTODON_AGENT_DEBUG: True
       MASTODON_AGENT_DATABASE_URL: *database-url
-      MASTODON_AGENT_EMBEDDINGS_URL: *embeddings-url
+      MASTODON_AGENT_ML_API_URL: *mlapi-url
     depends_on:
       db:
         condition: service_healthy

@@ -44,14 +44,14 @@ EXPOSE ${PORT}
 
 FROM base as appserver_dev
 ENV FLASK_ENV=development
-ENTRYPOINT /app/scripts/start-app-dev.sh
+ENTRYPOINT /app/scripts/start-webapp-dev.sh
 
 # --------------------------------------------------------------
 
 FROM base as appserver_prod
 ENV FLASK_ENV=production
 COPY . .
-ENTRYPOINT /app/scripts/start-app.sh
+ENTRYPOINT /app/scripts/start-webapp.sh
 
 # --------------------------------------------------------------
 

@@ -20,9 +20,14 @@ class Config:
     client_secret: str = ""
     access_token: str = ""
 
+    # hugging face API token
     hf_token: str = ""
 
+    # CPU-bound torchserve docker container for emebeddings model
     embeddings_api_url: str = ""
+
+    # in-house proxy API to ML services
+    ml_api_url: str = ""
 
     user_agent: str = "PubPulse 0.1"
     debug_requests: bool = False

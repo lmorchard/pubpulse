@@ -16,7 +16,7 @@ Finally, install dependencies and start up the mix of docker and host services:
 python3 -m venv venv
 . ./venv/bin/activate
 pip install -r requirements.txt
-./scripts/start.sh
+./scripts/start-dev.sh
 ```
 
 Somewhere in those startup messages, you should see a URL for a jupyter notebook. Open that in your browser and have fun!
