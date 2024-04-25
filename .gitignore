@@ -16,3 +16,4 @@ notebook/config/migrated
 notebook/config/lab
 notebook/work
 notebook/config/serverconfig
+notebook/config/jupyter_server_config.json
